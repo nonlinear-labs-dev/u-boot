@@ -18,6 +18,8 @@
 
 #include <configs/ti_am335x_common.h>
 
+#define CONFIG_ENV_IS_NOWHERE
+
 #ifndef CONFIG_SPL_BUILD
 # define CONFIG_TIMESTAMP
 # define CONFIG_LZO
@@ -101,7 +103,19 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
 	DEFAULT_MMC_TI_ARGS \
-	"boot_fdt=try\0" \
+	"nlinit=setenv IMG_ADDR 0x80000000; setenv IMG_NAME nonlinear.img; setenv HEADER_SIZE 0x400; setenv fdtaddr 0x88000000; setenv kloadaddr 0x80007fc0\0" \
+	"loadusbaddr=setexpr.l KERNEL_SIZE *0x80000000; setexpr.l KERNEL_START *0x80000004; setexpr.l DTS_SIZE *0x80000008; setexpr.l DTS_START *0x8000000C; setexpr.l ROOTFS_SIZE *0x80000010; setexpr.l ROOTFS_START *0x80000014\0" \
+	"showusbaddr=echo KERNEL_SIZE=${KERNEL_SIZE}; echo KERNEL_START=${KERNEL_START}; echo DTS_SIZE=${DTS_SIZE}; echo DTS_START=${DTS_START}; echo ROOTFS_SIZE=${ROOTFS_SIZE}; echo ROOTFS_START=${ROOTFS_START}\0" \
+	"loadheader=load usb 0:0 ${IMG_ADDR} ${IMG_NAME} ${HEADER_SIZE}\0" \
+	"loadkernel=load usb 0:0 ${kloadaddr} ${IMG_NAME} ${KERNEL_SIZE} ${KERNEL_START}\0" \
+	"loaddts=load usb 0:0 ${fdtaddr} ${IMG_NAME} ${DTS_SIZE} ${DTS_START}\0" \
+	"nlboot=run nlinit; run tryusb; run trymmc; run trymmc2; run tryemmc; run tryemmc2\0" \
+	"tryusb=usb start; echo '#### Trying USB Boot ####'; if usb part 0:0; then if fatsize usb 0:0 ${IMG_NAME}; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; fi; usb stop\0" \
+	"trymmc=mmc dev 0; echo '#### Trying MMC Boot ####'; if mmc rescan; then load mmc 0:1 ${kloadaddr} boot/uImage; load mmc 0:1 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p1 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
+	"trymmc2=mmc dev 0; echo '#### Trying MMC2 Boot ####'; if mmc rescan; then load mmc 0:2 ${kloadaddr} boot/uImage; load mmc 0:2 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p2 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
+	"tryemmc=mmc dev 1; echo '#### Trying eMMC Boot ####'; if mmc rescan; then load mmc 1:1 ${kloadaddr} boot/uImage; load mmc 1:1 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p1 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
+	"tryemmc2=mmc dev 1; echo '#### Trying eMMC2 Boot ####'; if mmc rescan; then load mmc 1:2 ${kloadaddr} boot/uImage; load mmc 1:2 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p2 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
+	"bootcmd=run nlboot\0" \
 	"bootpart=0:2\0" \
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
@@ -320,8 +334,6 @@
 
 #if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_USBETH_SUPPORT)
 /* Remove other SPL modes. */
-#define CONFIG_ENV_IS_NOWHERE
-#undef CONFIG_ENV_IS_IN_NAND
 /* disable host part of MUSB in SPL */
 /* disable EFI partitions and partition UUID support */
 #undef CONFIG_PARTITION_UUIDS
@@ -383,7 +395,6 @@
 #define CONFIG_SPL_SPI_LOAD
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x20000
 
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 #define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
 #define CONFIG_ENV_SECT_SIZE		(4 << 10) /* 4 KB sectors */
@@ -395,14 +406,12 @@
 					"128k(u-boot-env2),3464k(kernel)," \
 					"-(rootfs)"
 #elif defined(CONFIG_EMMC_BOOT)
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		1
 #define CONFIG_SYS_MMC_ENV_PART		2
 #define CONFIG_ENV_OFFSET		0x0
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 #elif defined(CONFIG_NOR_BOOT)
-#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SECT_SIZE		(128 << 10)	/* 128 KiB */
 #define CONFIG_ENV_OFFSET		(512 << 10)	/* 512 KiB */
 #define CONFIG_ENV_OFFSET_REDUND	(768 << 10)	/* 768 KiB */
