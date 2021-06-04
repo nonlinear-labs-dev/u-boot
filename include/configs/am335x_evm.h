@@ -109,7 +109,7 @@
 	"loadheader=load usb 0:0 ${IMG_ADDR} ${IMG_NAME} ${HEADER_SIZE}\0" \
 	"loadkernel=load usb 0:0 ${kloadaddr} ${IMG_NAME} ${KERNEL_SIZE} ${KERNEL_START}\0" \
 	"loaddts=load usb 0:0 ${fdtaddr} ${IMG_NAME} ${DTS_SIZE} ${DTS_START}\0" \
-	"nlboot=run nlinit; run tryusb; run trymmc; run trymmc2; run tryemmc; run tryemmc2\0" \
+	"nlboot= run nlinit; run tryusb; echo '#### Trying new uboot ####'; run tryemmc; run tryemmc2\0" \
 	"tryusb=usb start; echo '#### Trying USB Boot ####'; if usb part 0:0; then if fatsize usb 0:0 ${IMG_NAME}; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; fi; usb stop\0" \
 	"trymmc=mmc dev 0; echo '#### Trying MMC Boot ####'; if mmc rescan; then load mmc 0:1 ${kloadaddr} boot/uImage; load mmc 0:1 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p1 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
 	"trymmc2=mmc dev 0; echo '#### Trying MMC2 Boot ####'; if mmc rescan; then load mmc 0:2 ${kloadaddr} boot/uImage; load mmc 0:2 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p2 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
