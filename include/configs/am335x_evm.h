@@ -109,8 +109,9 @@
 	"loadheader=load usb 0:0 ${IMG_ADDR} ${IMG_NAME} ${HEADER_SIZE}\0" \
 	"loadkernel=load usb 0:0 ${kloadaddr} ${IMG_NAME} ${KERNEL_SIZE} ${KERNEL_START}\0" \
 	"loaddts=load usb 0:0 ${fdtaddr} ${IMG_NAME} ${DTS_SIZE} ${DTS_START}\0" \
-        "nlboot=run nlinit; echo '#### Checking Devices and Partitions ####'; mmc list; run showinfommc; run tryusb\0" \
-        "showinfommc=mmc dev 0; mmc rescan; mmcinfo; mmc part;\0" \
+        "nlboot=run nlinit; echo '#### Checking Devices and Partitions ####'; mmc list; run infommc; run infoemmc; run tryusb\0" \
+        "infommc=mmc dev 0; mmc rescan; mmcinfo; mmc part;\0" \
+        "infoemmc=mmc dev 1; mmc rescan; mmcinfo; mmc part;\0" \
         "tryusb=usb start; echo '#### Trying USB Boot ####'; if usb part 0:0; then if fatsize usb 0:0 ${IMG_NAME}; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; fi; usb stop\0" \
         "bootcmd=run nlboot\0" \
 	"bootpart=0:2\0" \
