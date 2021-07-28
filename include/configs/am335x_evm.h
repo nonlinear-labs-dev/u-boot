@@ -109,11 +109,12 @@
 	"loadheader=load usb 0:0 ${IMG_ADDR} ${IMG_NAME} ${HEADER_SIZE}\0" \
 	"loadkernel=load usb 0:0 ${kloadaddr} ${IMG_NAME} ${KERNEL_SIZE} ${KERNEL_START}\0" \
 	"loaddts=load usb 0:0 ${fdtaddr} ${IMG_NAME} ${DTS_SIZE} ${DTS_START}\0" \
-        "nlboot=run nlinit; echo '#### Checking Devices and Partitions ####'; mmc list; run infommcpartone; run infommcparttwo; run infoemmcpartone; run infoemmcpartone; run tryusb\0" \
+        "nlboot=run nlinit; echo '#### Checking Devices and Partitions ####'; mmc list; run infommcpartone; run infommcparttwo; run infoemmcpartone; run infoemmcparttwo; run tryemmc; run tryusb\0" \
         "infommcpartone=echo '#### Info MMC, Part 1 ####'; mmc dev 0 1; mmc rescan; mmcinfo; mmc part;\0" \
         "infommcparttwo=echo '#### Info MMC, Part 2 ####'; mmc dev 0 2; mmc rescan; mmcinfo; mmc part;\0" \
         "infoemmcpartone=echo '#### Info eMMC, Part 1 ####'; mmc dev 1 1; mmc rescan; mmcinfo; mmc part;\0" \
         "infoemmcparttwo=echo '#### Info eMMC, Part 2 ####'; mmc dev 1 2; mmc rescan; mmcinfo; mmc part;\0" \
+        "tryemmc=mmc dev 1; echo '#### Trying eMMC Boot ####'; if mmc rescan; then load mmc 1:1 ${kloadaddr} boot/uImage; load mmc 1:1 ${fdtaddr} boot/nonlinear-labs-2D.dtb; setenv mmcroot /dev/mmcblk0p1 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
         "tryusb=usb start; echo '#### Trying USB Boot ####'; if usb part 0:0; then if fatsize usb 0:0 ${IMG_NAME}; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; fi; usb stop\0" \
         "bootcmd=run nlboot\0" \
 	"bootpart=0:2\0" \
