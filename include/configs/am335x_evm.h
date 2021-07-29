@@ -104,7 +104,7 @@
 	DEFAULT_LINUX_BOOT_ENV \
         DEFAULT_MMC_TI_ARGS \
         "nlinit=setenv IMG_ADDR 0x80000000; setenv IMG_NAME nonlinear.img; setenv HEADER_SIZE 0x400; setenv fdtaddr 0x88000000; setenv kloadaddr 0x80007fc0;" \
-                "mmc dev 0; if mmc rescan; then setenv emmcroot /dev/mmcblk0p1 ro; else setenv emmcroot /dev/mmcblk1p1 ro; fi\0" \
+                "mmc dev 0; if mmc rescan; then setenv emmcroot /dev/mmcblk1p1 ro; else setenv emmcroot /dev/mmcblk0p1 ro; fi\0" \
 	"loadusbaddr=setexpr.l KERNEL_SIZE *0x80000000; setexpr.l KERNEL_START *0x80000004; setexpr.l DTS_SIZE *0x80000008; setexpr.l DTS_START *0x8000000C; setexpr.l ROOTFS_SIZE *0x80000010; setexpr.l ROOTFS_START *0x80000014\0" \
 	"showusbaddr=echo KERNEL_SIZE=${KERNEL_SIZE}; echo KERNEL_START=${KERNEL_START}; echo DTS_SIZE=${DTS_SIZE}; echo DTS_START=${DTS_START}; echo ROOTFS_SIZE=${ROOTFS_SIZE}; echo ROOTFS_START=${ROOTFS_START}\0" \
 	"loadheader=load usb 0:0 ${IMG_ADDR} ${IMG_NAME} ${HEADER_SIZE}\0" \
@@ -112,9 +112,9 @@
 	"loaddts=load usb 0:0 ${fdtaddr} ${IMG_NAME} ${DTS_SIZE} ${DTS_START}\0" \
         "nlboot=run nlinit; run tryemmc; run trymmc; run tryusb\0" \
         "tryemmc=mmc dev 1; echo '#### eMMC Boot ####'; if mmc rescan; then load mmc 1:1 ${kloadaddr} boot/uImage; load mmc 1:1 ${fdtaddr} boot/nonlinear-labs-2D.dtb;" \
-                "setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${emmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
+                "setenv mmcrootfstype ext4; setenv bootargs console=${console} ${optargs} root=${emmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
         "trymmc=mmc dev 0; echo '#### MMC Boot ####'; if mmc rescan; then load mmc 0:2 ${kloadaddr} boot/uImage; load mmc 0:2 ${fdtaddr} boot/nonlinear-labs-2D.dtb;"\
-                "setenv mmcroot /dev/mmcblk0p2 ro; setenv mmcrootfstype ext4 rootwait; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
+                "setenv mmcroot /dev/mmcblk0p2 ro; setenv mmcrootfstype ext4; setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
         "tryusb=usb start; echo '#### USB Boot ####'; if usb part 0:0; then if fatsize usb 0:0 ${IMG_NAME}; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; fi; usb stop\0" \
         "bootcmd=run nlboot\0" \
 	"bootpart=0:2\0" \
