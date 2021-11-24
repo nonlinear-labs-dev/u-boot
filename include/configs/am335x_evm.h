@@ -1,4 +1,4 @@
-    /*
+/*
  * am335x_evm.h
  *
  * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
