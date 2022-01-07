@@ -114,7 +114,7 @@
         "loadkernel=load usb ${USB_LOAD_PART} ${kloadaddr} ${IMG_NAME} ${KERNEL_SIZE} ${KERNEL_START}\0" \
         "loaddts=load usb ${USB_LOAD_PART} ${fdtaddr} ${IMG_NAME} ${DTS_SIZE} ${DTS_START}\0" \
         "nlboot=run nlinit; run tryusb; run tryemmc\0" \
-        "tryusb=echo '#### USB Boot ####'; if test ${USB_LOAD} = "true"; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; usb stop\0" \
+        "tryusb=echo '#### USB Boot ####'; if test ${USB_LOAD} = " true"; then run loadheader; run loadusbaddr; run loadkernel; run loaddts; fdt addr ${fdtaddr}; fdt resize; setenv bootargs console=${console}; bootm ${kloadaddr} - ${fdtaddr}; fi; usb stop\0" \
         "tryemmc=echo '#### eMMC Boot ####'; mmc dev 1; if mmc rescan; then load mmc 1:1 ${kloadaddr} boot/uImage; load mmc 1:1 ${fdtaddr} boot/nonlinear-labs-2D.dtb;" \
                 "setenv mmcrootfstype ext4; setenv bootargs console=${console} ${optargs} root=${emmcroot} rootfstype=${mmcrootfstype}; bootm ${kloadaddr} - ${fdtaddr}; fi\0" \
         "bootcmd=run nlboot\0" \
