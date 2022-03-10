@@ -107,7 +107,7 @@
                 "mmc dev 0; if mmc rescan; then setenv emmcroot /dev/mmcblk1p1 ro; else setenv emmcroot /dev/mmcblk0p1 ro; fi;" \
                 "usb start; if fatsize usb 0:1 ${IMG_NAME}; then setenv USB_LOAD_PART 0:1; fi;" \
                 "if fatsize usb 0:0 ${IMG_NAME}; then setenv USB_LOAD_PART 0:0; fi;" \
-                "if env exists USB_LOAD_PART; then setenv USB_LOAD true; else setenv USB_LOAD false; fi\0" \
+                "if env exists USB_LOAD_PART; then echo 'USB image detected!'; setenv USB_LOAD true; else echo 'No USB image detected...'; setenv USB_LOAD false; fi\0" \
 	"loadusbaddr=setexpr.l KERNEL_SIZE *0x80000000; setexpr.l KERNEL_START *0x80000004; setexpr.l DTS_SIZE *0x80000008; setexpr.l DTS_START *0x8000000C; setexpr.l ROOTFS_SIZE *0x80000010; setexpr.l ROOTFS_START *0x80000014\0" \
 	"showusbaddr=echo KERNEL_SIZE=${KERNEL_SIZE}; echo KERNEL_START=${KERNEL_START}; echo DTS_SIZE=${DTS_SIZE}; echo DTS_START=${DTS_START}; echo ROOTFS_SIZE=${ROOTFS_SIZE}; echo ROOTFS_START=${ROOTFS_START}\0" \
         "loadheader=load usb ${USB_LOAD_PART} ${IMG_ADDR} ${IMG_NAME} ${HEADER_SIZE}\0" \
